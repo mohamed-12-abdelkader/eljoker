@@ -10,10 +10,10 @@ const GitTeacherDetails = ({ id }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await baseUrl.get(`api/month/teacher/${id}`, {
-          headers: { token: token },
+        const response = await baseUrl.get(`/api/student/teacher/1753/details`, {
+          headers: { Authorization: `bearer ${token}` },
         });
-        setTeacher(response.data);
+        setTeacher(response.data.courses);
       } catch (error) {
         console.log(error);
       } finally {

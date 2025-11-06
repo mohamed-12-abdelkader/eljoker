@@ -4,7 +4,7 @@ import React from "react";
 const WhatsButton = () => {
   const handleWhatsappClick = () => {
     // Replace `123456789` with the phone number you want to chat with
-    const phoneNumber = "+201111272393";
+    const phoneNumber = "+201550470102";
     const whatsappUrl = `https://wa.me/${phoneNumber}`;
     window.open(whatsappUrl, "_blank");
   };

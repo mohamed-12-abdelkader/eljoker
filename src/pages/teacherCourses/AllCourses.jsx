@@ -83,7 +83,7 @@ const AllCourses = () => {
                   <hr />
 
                   <div className="my-3 flex justify-center">
-                    <Link to={`/month/${lectre.id}`}>
+                    <Link to={`/CourseDetailsPage/${lectre.id}`}>
                       <Button className="m-2" colorScheme="blue">
                         {" "}
                         دخول للكورس{" "}

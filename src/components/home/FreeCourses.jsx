@@ -92,7 +92,7 @@ const FreeCourses = () => {
                   <hr />
                   <div className="my-3 text-center">
                     {lectre.open ? (
-                      <Link to={`/month/${lectre.id}`}>
+                      <Link to={`/CourseDetailsPage/${lectre.id}`}>
                         <Button
                           colorScheme="blue"
                           variant="outline"

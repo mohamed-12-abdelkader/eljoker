@@ -48,6 +48,9 @@ import TeacherCourses from "../pages/teacherCourses/TeacherCourses";
 import AllCourses from "../pages/teacherCourses/AllCourses";
 import NotFound from "../components/not found/NotFound";
 import CreateCode from "../components/admin/teacher/CreateCode";
+import CourseDetailsPage from "../pages/course/CourseDetailsPage";
+import ComprehensiveExam from "../pages/exam/ComprehensiveExam";
+import TeacherChat from "../pages/chat/TeacherChatPage";
 
 const AppRouter = () => {
   const [userData, isAdmin, isTeacher, student] = UserType();
@@ -143,9 +146,12 @@ const AppRouter = () => {
         <Route element={<ProtectedRoute auth={student} />}>
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />
+          
+          <Route path="/teacherChat" element={<TeacherChat />} />
           <Route path="/my_lecture" element={<MyLecture />} />
           <Route path="/teacher/:id" element={<TeacherDetails />} />
           <Route path="/exam/:examId" element={<Exam />} />
+          <Route path="/ComprehensiveExam/:id" element={<ComprehensiveExam />} />
         </Route>
         <Route element={<ProtectedRoute auth={isTeacher} />}>
           <Route path="/teacher_wallet" element={<TeacherWallet />} />
@@ -161,6 +167,7 @@ const AppRouter = () => {
         <Route element={<ProtectedRoute auth={isTeacher || student} />}>
           <Route path="/lecture/:id/" element={<LecturDetails />}></Route>
           <Route path="/month/:id/" element={<Month />}></Route>
+          <Route path="/CourseDetailsPage/:id/" element={<CourseDetailsPage />}></Route>
           <Route path="/video/:videoId" element={<Vedio />} />
 
           <Route path="/video/:videoId" element={<Vedio />} />

@@ -10,8 +10,8 @@ const GitMyMonthes = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await baseUrl.get("api/month/mymonthuser", {
-          headers: { token: token },
+        const response = await baseUrl.get("api/course/my-enrollments", {
+          headers: { Authorization: `bearer ${token}` },
         });
         setMyLecture(response.data);
       } catch (error) {

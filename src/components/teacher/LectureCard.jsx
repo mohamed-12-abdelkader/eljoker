@@ -26,7 +26,7 @@ const LectureCard = ({ lecture, onOpen, setSelectedLecture }) => (
       <hr />
       <div className="my-3 text-center">
         {lecture.open ? (
-          <Link to={`/month/${lecture.id}`}>
+          <Link to={`/CourseDetailsPage/${lecture.id}`}>
             <Button
               colorScheme="blue"
               variant="outline"

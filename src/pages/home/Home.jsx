@@ -14,7 +14,7 @@ const Home = () => {
     <div>
       <SectionOne />
       {student ? (
-        <div>
+        <div className="mb-[100px]">
           <LoginHome />
         </div>
       ) : (

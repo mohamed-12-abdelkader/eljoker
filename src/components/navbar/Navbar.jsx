@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 
 import { FaMoon, FaSun } from "react-icons/fa"; // استخدمت react-icons بدلاً من @chakra-ui/icons
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { CiLogin } from "react-icons/ci";
 import { IoPerson } from "react-icons/io5";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -27,7 +27,7 @@ import { FaVideo } from "react-icons/fa6";
 import MyWallet from "../../Hooks/student/MyWallet";
 import { PiVideoFill } from "react-icons/pi";
 
-import logo from "../../img/logo22 (1).png";
+import logo from "../../img/055355 copy.jpg";
 const NavLink = () => {
   return (
     <Box
@@ -50,6 +50,12 @@ export default function Nav() {
   const [userData, isAdmin, isTeacher, student] = UserType();
   const user = JSON.parse(localStorage.getItem("user"));
   const { colorMode, toggleColorMode } = useColorMode();
+  const location = useLocation();
+
+  // إخفاء الـ Navbar في صفحة teacherChat
+  if (location.pathname === "/teacherChat") {
+    return null;
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -78,7 +84,7 @@ export default function Nav() {
           className="mt-1"
         >
           <Link to="/">
-            <img src={logo} className="h-[80px] w-[120px] my-2" />
+            <img src={logo} className="h-[80px] w-[200px] my-2" />
           </Link>
 
           <Flex alignItems={"center"}>
