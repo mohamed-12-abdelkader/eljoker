@@ -27,7 +27,7 @@ import { FaVideo } from "react-icons/fa6";
 import MyWallet from "../../Hooks/student/MyWallet";
 import { PiVideoFill } from "react-icons/pi";
 
-import logo from "../../img/055355 copy.jpg";
+import logo from "../../img/055355_copy-removebg-preview.png";
 const NavLink = () => {
   return (
     <Box
@@ -84,11 +84,22 @@ export default function Nav() {
           className="mt-1"
         >
           <Link to="/">
-            <img src={logo} className="h-[80px] w-[200px] my-2" />
+            <img src={logo} className="h-[80px] w-[250px] my-2" />
           </Link>
 
           <Flex alignItems={"center"}>
             <Stack direction={"row"} spacing={2}>
+              {/* Dark/Light Mode Toggle Button */}
+              <Button
+                onClick={toggleColorMode}
+                variant="ghost"
+                size="md"
+                aria-label="Toggle color mode"
+                colorScheme={useColorModeValue("blue", "yellow")}
+              >
+                {colorMode === "light" ? <FaMoon /> : <FaSun />}
+              </Button>
+              
               {user ? (
                 <Menu>
                   <MenuButton

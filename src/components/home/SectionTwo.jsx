@@ -17,6 +17,9 @@ const SectionTwo = () => {
   const cardBg = useColorModeValue("rgba(255, 255, 255, 0.9)", "rgba(45, 55, 72, 0.8)");
   const textColor = useColorModeValue("gray.900", "white");
   const descriptionColor = useColorModeValue("gray.600", "gray.400");
+  const boxShadow = useColorModeValue("0 8px 30px rgba(0, 0, 0, 0.1)", "0 8px 30px rgba(0, 0, 0, 0.3)");
+  const boxShadowHover = useColorModeValue("0 12px 50px rgba(0, 0, 0, 0.2)", "0 12px 50px rgba(0, 0, 0, 0.5)");
+  const borderColor = useColorModeValue("1px solid rgba(255, 255, 255, 0.18)", "1px solid rgba(255, 255, 255, 0.1)");
 
   const features = [
     {
@@ -73,7 +76,7 @@ const SectionTwo = () => {
               className="text-6xl my-3 bg-gradient-to-r from-blue-600 via-cyan-600 to-purple-600 bg-clip-text text-transparent sm:text-5xl lg:text-7xl font-extrabold leading-tight">
         خدماتنا التعليمية في الكيمياء
       </motion.h1>
-      <Text fontSize="lg" color="blue.500" mb={10}>
+      <Text fontSize="lg" color={useColorModeValue("blue.500", "cyan.300")} mb={10}>
         ابدأ رحلتك في عالم الكيمياء مع أستاذ مصطفى نوفل - شرح مبسط، أمثلة عملية، ونتائج مضمونة
       </Text>
 
@@ -84,13 +87,13 @@ const SectionTwo = () => {
             p={8}
             bg={cardBg}
             backdropFilter="blur(10px)"
-            border="1px solid rgba(255, 255, 255, 0.18)"
+            border={borderColor}
             borderRadius="2xl"
-            boxShadow="0 8px 30px rgba(0, 0, 0, 0.1)"
+            boxShadow={boxShadow}
             transition="transform 0.4s ease, box-shadow 0.4s ease"
             _hover={{
               transform: "translateY(-10px)",
-              boxShadow: "0 12px 50px rgba(0, 0, 0, 0.2)",
+              boxShadow: boxShadowHover,
             }}
             w={{ base: "100%", sm: "45%", md: "30%", lg: "30%" }}
           >

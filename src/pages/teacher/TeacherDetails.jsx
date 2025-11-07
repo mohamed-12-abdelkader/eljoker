@@ -82,7 +82,7 @@ const TeacherDetails = () => {
   }
 
   return (
-    <div dir="rtl" className=" bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 py-8 px-4 md:px-8 mt-[80px]">
+    <div dir="rtl" className=" py-8 px-4 md:px-8 mt-[80px]">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-8">
@@ -103,7 +103,7 @@ const TeacherDetails = () => {
               {courses.map((course) => (
                 <Card
                   key={course.id}
-                  className="group overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 bg-white"
+                  className="group mx-auto overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 bg-white"
                   style={{ borderRadius: "16px" }}
                 >
                   {/* Image Container with Overlay */}

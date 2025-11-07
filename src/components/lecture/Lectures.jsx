@@ -9,7 +9,7 @@ const Lectures = () => {
   const courses = allCourses.filter((course) => course.teacher_id === 1753);
   
   return (
-    <div dir="rtl" className=" bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 py-8 px-4 md:px-8">
+    <div dir="rtl" className="  py-8 px-4 md:px-8">
       {/* Header Section */}
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -45,7 +45,7 @@ const Lectures = () => {
             {courses.map((lectre) => (
               <Card
                 key={lectre.id}
-                className="group overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 bg-white"
+                className="group mx-auto overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 bg-white"
                 style={{ borderRadius: "16px" }}
               >
                 {/* Image Container with Overlay */}
