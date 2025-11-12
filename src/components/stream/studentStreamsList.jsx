@@ -97,7 +97,7 @@ const StudentStreamsList = ({ courseId }) => {
                 {stream.status === "started" && (
                   <IconButton
                     as="a"
-                    href={`${STREAM_REDIRECT_URL}/${
+                    href={`https://stream.e-monline.online/stream/${
                       stream.id
                     }?t=${localStorage.getItem("token")}`}
                     target="_blank"
