@@ -77,38 +77,69 @@ const LoginPage = () => {
 
       const response = await baseUrl.post(`api/login`, requestData);
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      localStorage.setItem("employee_data", JSON.stringify(response.data.employee_data));
+      // التحقق من وجود البيانات المطلوبة
+      if (!response || !response.data) {
+        throw new Error("استجابة غير صحيحة من الخادم");
+      }
+
+      // حفظ البيانات
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
+      if (response.data.employee_data) {
+        localStorage.setItem("employee_data", JSON.stringify(response.data.employee_data));
+      }
 
       // Show success modal
       setShowSuccessModal(true);
       
-        const params = new URLSearchParams(window.location.search);
+      const params = new URLSearchParams(window.location.search);
       const redirectTarget = params.get("redirect");
       const destination = redirectTarget && redirectTarget.startsWith("/") ? redirectTarget : "/";
+      
+      // Redirect after 2 seconds
       setTimeout(() => {
         window.location.href = destination;
-      }, 500);
-            window.location.reload()
-        navigate('/');
-      // Redirect after 2 seconds
+      }, 2000);
     
     } catch (error) {
       console.error('Login error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        request: error.request,
+        config: error.config
+      });
+      
+      // معالجة الأخطاء المختلفة
       if (error.response) {
-        if (error.response.data.msg === "You must login from the same device") {
-          toast.error("لقد تجاوزت الحد المسموح لك من الاجهزة");
-        } else if (error.response.data.msg === "Invalid username or password" || 
-                   error.response.data.message?.includes("Invalid credentials") ||
-                   error.response.data.message?.includes("User not found") ||
-                   error.response.data.message?.includes("Wrong password")) {
+        // الخطأ من السيرفر (يوجد response)
+        const errorData = error.response.data || {};
+        const errorMsg = errorData.msg || errorData.message || error.response.statusText;
+        
+        if (error.response.status === 401 || 
+            errorMsg === "Invalid username or password" || 
+            errorMsg?.includes("Invalid credentials") ||
+            errorMsg?.includes("User not found") ||
+            errorMsg?.includes("Wrong password")) {
           onOpen(); // فتح المودال عند خطأ في البيانات
+        } else if (errorMsg === "You must login from the same device") {
+          toast.error("لقد تجاوزت الحد المسموح لك من الاجهزة");
         } else {
-          toast.error(error.response.data.msg || "حدث خطأ أثناء تسجيل الدخول");
+          toast.error(errorMsg || `حدث خطأ أثناء تسجيل الدخول (${error.response.status})`);
         }
+      } else if (error.request) {
+        // الطلب تم إرساله ولكن لم يتم استلام response
+        console.error('Network error - Request sent but no response:', error.request);
+        const errorMessage = error.message || "لا يمكن الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت";
+        toast.error(errorMessage);
       } else {
-        toast.error("حدث خطأ في الاتصال بالخادم");
+        // خطأ في إعداد الطلب
+        console.error('Request setup error:', error.message);
+        toast.error(error.message || "حدث خطأ في الاتصال بالخادم");
       }
     } finally {
       setLoading(false);

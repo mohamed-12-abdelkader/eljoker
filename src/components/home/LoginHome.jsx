@@ -10,12 +10,13 @@ import SectionTwo from "./SectionTwo";
 import AllTeacherLogin from "../teacher/AllTeacherLogin";
 import FreeCourses from "./FreeCourses";
 import TeacherDetails from "../../pages/teacher/TeacherDetails";
+import MyCourses from "../course/MyCourses";
 
 const LoginHome = () => {
   return (
     <div className="mt-[50px]">
-      <div dir="ltr" className="m-auto">
-        <Lectures />
+      <div  className="m-auto">
+       <MyCourses/>
       </div>
       <TeacherDetails />
 
