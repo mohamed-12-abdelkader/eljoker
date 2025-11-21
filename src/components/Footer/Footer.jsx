@@ -53,7 +53,7 @@ const Footer = () => {
     return (
       <div
         dir="rtl"
-        className="fixed bottom-0 left-0 right-0 bg-gray-100 border-t border-gray-200 shadow-lg z-50"
+        className="fixed bottom-0 left-0 right-0 bg-gray-100 border-t border-gray-200 shadow-lg z-0"
       >
         <div className="max-w-full mx-auto">
           <div className="flex justify-around items-center py-2 px-2">

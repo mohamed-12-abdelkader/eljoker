@@ -642,7 +642,7 @@ const ComprehensiveExam = () => {
   // عرض درجات الطلاب
   if (showGrades) {
     return (
-      <Box maxW="2xl" mx="auto" py={10} px={4} className="my-[100px]">
+      <Box maxW="2xl" mx="auto" py={10} px={4} className="mt-[100px]">
         <Heading mb={8} textAlign="center" color="blue.600">درجات الطلاب في الامتحان</Heading>
         <Button mb={6} colorScheme="blue" onClick={() => setShowGrades(false)}>
           عودة للأسئلة
@@ -680,7 +680,7 @@ const ComprehensiveExam = () => {
   }
 
   return (
-    <Box maxW="90%" mx="auto"  px={{ base: 2, sm: 4, md: 6 }} className="mt-[20px]">
+    <Box maxW="90%" mx="auto"  px={{ base: 2, sm: 4, md: 6 }} className="mt-[20px] mb-[150px]">
       <style>
         {`
           @keyframes pulse {
