@@ -642,7 +642,7 @@ const ComprehensiveExam = () => {
   // عرض درجات الطلاب
   if (showGrades) {
     return (
-      <Box maxW="2xl" mx="auto" py={10} px={4} className="mt-[80px]">
+      <Box maxW="2xl" mx="auto" py={10} px={4} className="my-[100px]">
         <Heading mb={8} textAlign="center" color="blue.600">درجات الطلاب في الامتحان</Heading>
         <Button mb={6} colorScheme="blue" onClick={() => setShowGrades(false)}>
           عودة للأسئلة
