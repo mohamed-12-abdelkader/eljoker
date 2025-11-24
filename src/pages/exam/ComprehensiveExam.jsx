@@ -1014,7 +1014,7 @@ const ComprehensiveExam = () => {
   }
 
   return (
-    <Box maxW="90%" mx="auto"  px={{ base: 2, sm: 4, md: 6 }} className="mt-[20px]">
+    <Box maxW="90%" mx="auto"  px={{ base: 2, sm: 4, md: 6 }} className="mt-[20px] mb-[180px]">
       <style>
         {`
           @keyframes pulse {
