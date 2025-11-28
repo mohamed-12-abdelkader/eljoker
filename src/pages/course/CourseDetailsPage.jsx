@@ -590,30 +590,146 @@ const CourseDetailsPage = () => {
       try {
         setCourseExamsLoading(true);
         setCourseExamsError(null);
-        const response = await baseUrl.get(`api/course/${id}/course-exams`, {
+        // استخدام endpoint مختلف للطلاب
+        const endpoint = (isAdmin || isTeacher) 
+          ? `api/course/${id}/course-exams`
+          : `api/exams/course/${id}/student`;
+        const response = await baseUrl.get(endpoint, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setCourseExams(response.data.exams || []);
+        
+        // تسجيل مؤقت للتشخيص
+        console.log('Course Exams Response:', response.data);
+        
+        // التحقق من وجود البيانات في response.data
+        if (response.data) {
+          // إذا كانت البيانات تحتوي على exams array
+          if (response.data.exams && Array.isArray(response.data.exams)) {
+            setCourseExams(response.data.exams);
+            setCourseExamsError(null); // مسح أي خطأ سابق
+          } 
+          // إذا كانت البيانات مصفوفة مباشرة
+          else if (Array.isArray(response.data)) {
+            setCourseExams(response.data);
+            setCourseExamsError(null); // مسح أي خطأ سابق
+          } 
+          // إذا كانت البيانات كائن فارغ أو null
+          else if (response.data.exams === null || response.data.exams === undefined) {
+            setCourseExams([]);
+            setCourseExamsError(null); // لا نعرض خطأ إذا كانت القائمة فارغة
+          } 
+          else {
+            console.warn('Unexpected response structure:', response.data);
+            setCourseExams([]);
+            setCourseExamsError(null); // لا نعرض خطأ للبنية غير المتوقعة
+          }
+        } else {
+          setCourseExams([]);
+          setCourseExamsError(null);
+        }
       } catch (error) {
-        setCourseExamsError('حدث خطأ في تحميل الامتحانات الشاملة');
+        console.error('Error fetching course exams:', error);
+        // التحقق من نوع الخطأ
+        if (error.response) {
+          const status = error.response.status;
+          const errorMessage = error.response?.data?.message || error.message;
+          
+          // إذا كان الخطأ 403 (Forbidden)، قد يكون بسبب الصلاحيات
+          if (status === 403) {
+            // إذا كان المستخدم ليس مدرس أو admin، قد يكون هذا طبيعي
+            if (!isAdmin && !isTeacher) {
+              // للطلاب، إذا كان الخطأ 403، قد يعني أنه لا توجد امتحانات متاحة لهم
+              setCourseExams([]);
+              setCourseExamsError(null); // لا نعرض خطأ للطلاب
+            } else {
+              setCourseExamsError(errorMessage || 'غير مصرح لك بالوصول إلى هذه الامتحانات');
+              setCourseExams([]);
+            }
+          } else {
+            setCourseExamsError(errorMessage || 'حدث خطأ في تحميل الامتحانات الشاملة');
+            setCourseExams([]);
+          }
+        } else {
+          setCourseExamsError(error.message || 'حدث خطأ في تحميل الامتحانات الشاملة');
+          setCourseExams([]);
+        }
       } finally {
         setCourseExamsLoading(false);
       }
     };
-    fetchCourseExams();
-  }, [id, token]);
+    if (id && token) {
+      fetchCourseExams();
+    }
+  }, [id, token, isAdmin, isTeacher]);
 
   // بعد useEffect الخاص بجلب الامتحانات الشاملة:
   const refreshExams = async () => {
     try {
       setCourseExamsLoading(true);
       setCourseExamsError(null);
-      const response = await baseUrl.get(`api/course/${id}/course-exams`, {
+      // استخدام endpoint مختلف للطلاب
+      const endpoint = (isAdmin || isTeacher) 
+        ? `api/course/${id}/course-exams`
+        : `api/exams/course/${id}/student`;
+      const response = await baseUrl.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCourseExams(response.data.exams || []);
+      
+      // تسجيل مؤقت للتشخيص
+      console.log('Course Exams Refresh Response:', response.data);
+      
+      // التحقق من وجود البيانات في response.data
+      if (response.data) {
+        // إذا كانت البيانات تحتوي على exams array
+        if (response.data.exams && Array.isArray(response.data.exams)) {
+          setCourseExams(response.data.exams);
+          setCourseExamsError(null); // مسح أي خطأ سابق
+        } 
+        // إذا كانت البيانات مصفوفة مباشرة
+        else if (Array.isArray(response.data)) {
+          setCourseExams(response.data);
+          setCourseExamsError(null); // مسح أي خطأ سابق
+        } 
+        // إذا كانت البيانات كائن فارغ أو null
+        else if (response.data.exams === null || response.data.exams === undefined) {
+          setCourseExams([]);
+          setCourseExamsError(null); // لا نعرض خطأ إذا كانت القائمة فارغة
+        } 
+        else {
+          console.warn('Unexpected response structure:', response.data);
+          setCourseExams([]);
+          setCourseExamsError(null); // لا نعرض خطأ للبنية غير المتوقعة
+        }
+      } else {
+        setCourseExams([]);
+        setCourseExamsError(null);
+      }
     } catch (error) {
-      setCourseExamsError('حدث خطأ في تحميل الامتحانات الشاملة');
+      console.error('Error refreshing course exams:', error);
+      // التحقق من نوع الخطأ
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage = error.response?.data?.message || error.message;
+        
+        // إذا كان الخطأ 403 (Forbidden)، قد يكون بسبب الصلاحيات
+        if (status === 403) {
+          // إذا كان المستخدم ليس مدرس أو admin، قد يكون هذا طبيعي
+          if (!isAdmin && !isTeacher) {
+            // للطلاب، إذا كان الخطأ 403، قد يعني أنه لا توجد امتحانات متاحة لهم
+            setCourseExams([]);
+            setCourseExamsError(null); // لا نعرض خطأ للطلاب
+          } else {
+            setCourseExamsError(errorMessage || 'غير مصرح لك بالوصول إلى هذه الامتحانات');
+            setCourseExams([]);
+          }
+        } else {
+          setCourseExamsError(errorMessage || 'حدث خطأ في تحميل الامتحانات الشاملة');
+          setCourseExams([]);
+        }
+      } else {
+        setCourseExamsError(error.message || 'حدث خطأ في تحميل الامتحانات الشاملة');
+        setCourseExams([]);
+      }
     } finally {
       setCourseExamsLoading(false);
     }
@@ -998,55 +1114,31 @@ const CourseDetailsPage = () => {
     setDeleteDialog({ isOpen: false, type: '', id: null, title: '' });
   };
 
-  const formatDateToISO = (value) => (value ? new Date(value).toISOString() : null);
-
-  const buildExamPayload = (form, lectureId) => {
-    const payload = {
-      title: form.title?.trim() || '',
-      totalGrade: Number(form.totalGrade),
-      isVisible: form.isVisible ?? true,
-      lockNextLectures: form.lockNextLectures ?? true,
-      showAnswersImmediately: !!form.showAnswersImmediately,
-      allowMultipleAttempts: form.allowMultipleAttempts ?? true,
-      showAnswersLater: !!form.showAnswersLater,
-      timeLimitEnabled: !!form.timeLimitEnabled,
-    };
-
-    if (lectureId) {
-      payload.lectureId = lectureId;
-    }
-    payload.startWindow = form.startWindow ? formatDateToISO(form.startWindow) : null;
-    payload.endWindow = form.endWindow ? formatDateToISO(form.endWindow) : null;
-    payload.answersReleaseDate =
-      payload.showAnswersLater && form.answersReleaseDate
-        ? formatDateToISO(form.answersReleaseDate)
-        : null;
-    payload.timeLimitMinutes =
-      payload.timeLimitEnabled && form.timeLimitMinutes
-        ? Number(form.timeLimitMinutes)
-        : null;
-
-    return payload;
-  };
-
   // 2. دوال API للامتحان محسنة
   const createExam = async (lectureId, data) => {
     try {
       setExamActionLoading(true);
-      if (!lectureId) {
-        toast({
-          title: 'لا يمكن تحديد المحاضرة',
-          description: 'يرجى إعادة فتح نافذة الامتحان والمحاولة مرة أخرى.',
-          status: 'error',
-          duration: 4000,
-          isClosable: true
-        });
-        return;
+      
+      // تحضير البيانات للإرسال
+      const examData = {
+        title: data.title,
+        total_grade: data.total_grade,
+        duration: data.duration,
+        is_visible: data.is_visible,
+        lock_next_lectures: data.lock_next_lectures,
+        show_answers_immediately: data.show_answers_immediately,
+        show_answers_after_hours: data.show_answers_after_hours
+      };
+
+      // إضافة التواريخ إذا تم تحديدها
+      if (data.show_at) {
+        examData.show_at = new Date(data.show_at).toISOString();
+      }
+      if (data.hide_at) {
+        examData.hide_at = new Date(data.hide_at).toISOString();
       }
 
-      const examPayload = buildExamPayload(data, lectureId);
-
-      await baseUrl.post(`/api/exams`, examPayload, {
+      await baseUrl.post(`/api/course/lecture/${lectureId}/exam`, examData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -1078,9 +1170,27 @@ const CourseDetailsPage = () => {
   const updateExam = async (examId, data) => {
     try {
       setExamActionLoading(true);
-      const examPayload = buildExamPayload(data);
+      
+      // تحضير البيانات للإرسال
+      const examData = {
+        title: data.title,
+        total_grade: data.total_grade,
+        duration: data.duration,
+        is_visible: data.is_visible,
+        lock_next_lectures: data.lock_next_lectures,
+        show_answers_immediately: data.show_answers_immediately,
+        show_answers_after_hours: data.show_answers_after_hours
+      };
 
-      await baseUrl.patch(`/api/exams/${examId}`, examPayload, {
+      // إضافة التواريخ إذا تم تحديدها
+      if (data.show_at) {
+        examData.show_at = new Date(data.show_at).toISOString();
+      }
+      if (data.hide_at) {
+        examData.hide_at = new Date(data.hide_at).toISOString();
+      }
+
+      await baseUrl.patch(`api/course/lecture/exam/${examId}`, examData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -1183,115 +1293,49 @@ const CourseDetailsPage = () => {
 
   // 3. مودال إضافة/تعديل امتحان محسن
   const ExamModal = ({ isOpen, onClose, type, data, onSubmit, loading }) => {
-    const toast = useToast();
-    const initialExamForm = {
-      title: '',
-      totalGrade: 100,
-      isVisible: true,
-      lockNextLectures: true,
-      startWindow: '',
-      endWindow: '',
-      showAnswersImmediately: false,
-      allowMultipleAttempts: true,
-      showAnswersLater: false,
-      answersReleaseDate: '',
-      timeLimitEnabled: false,
-      timeLimitMinutes: 60,
-    };
-    const [formData, setFormData] = useState(initialExamForm);
-
-    const formatForDateInput = (value) =>
-      value ? dayjs(value).format('YYYY-MM-DDTHH:mm') : '';
+    const [formData, setFormData] = useState({
+      title: data?.title || '',
+      total_grade: data?.total_grade || 100,
+      duration: data?.duration || 60,
+      is_visible: data?.is_visible ?? true,
+      show_at: data?.show_at || '',
+      hide_at: data?.hide_at || '',
+      lock_next_lectures: data?.lock_next_lectures ?? true,
+      show_answers_immediately: data?.show_answers_immediately ?? false,
+      show_answers_after_hours: data?.show_answers_after_hours || 24,
+    });
 
     useEffect(() => {
       if (data) {
         setFormData({
           title: data.title || '',
-          totalGrade: Number(data.totalGrade ?? data.total_grade ?? 100),
-          isVisible: data.isVisible ?? data.is_visible ?? true,
-          lockNextLectures: data.lockNextLectures ?? data.lock_next_lectures ?? true,
-          startWindow: formatForDateInput(data.startWindow || data.show_at),
-          endWindow: formatForDateInput(data.endWindow || data.hide_at),
-          showAnswersImmediately:
-            data.showAnswersImmediately ?? data.show_answers_immediately ?? false,
-          allowMultipleAttempts: data.allowMultipleAttempts ?? true,
-          showAnswersLater: data.showAnswersLater ?? Boolean(data.answersReleaseDate),
-          answersReleaseDate: formatForDateInput(data.answersReleaseDate),
-          timeLimitEnabled:
-            data.timeLimitEnabled ?? Boolean(data.timeLimitMinutes ?? data.duration),
-          timeLimitMinutes: Number(data.timeLimitMinutes ?? data.duration ?? 60),
+          total_grade: data.total_grade || 100,
+          duration: data.duration || 60,
+          is_visible: data.is_visible ?? true,
+          show_at: data.show_at || '',
+          hide_at: data.hide_at || '',
+          lock_next_lectures: data.lock_next_lectures ?? true,
+          show_answers_immediately: data.show_answers_immediately ?? false,
+          show_answers_after_hours: data.show_answers_after_hours || 24,
         });
       } else {
-        setFormData(initialExamForm);
+        // إعادة تعيين القيم الافتراضية عند إضافة امتحان جديد
+        setFormData({
+          title: '',
+          total_grade: 100,
+          duration: 60,
+          is_visible: true,
+          show_at: '',
+          hide_at: '',
+          lock_next_lectures: true,
+          show_answers_immediately: false,
+          show_answers_after_hours: 24,
+        });
       }
     }, [data, isOpen]);
 
-    const validateForm = () => {
-      if (!formData.title.trim()) {
-        toast({
-          title: 'العنوان مطلوب',
-          description: 'يرجى إدخال عنوان واضح للامتحان.',
-          status: 'error',
-          duration: 4000,
-          isClosable: true,
-        });
-        return false;
-      }
-
-      if (!formData.totalGrade || formData.totalGrade <= 0) {
-        toast({
-          title: 'قيمة الدرجة غير صالحة',
-          description: 'يجب أن تكون الدرجة الكلية أكبر من صفر.',
-          status: 'error',
-          duration: 4000,
-          isClosable: true,
-        });
-        return false;
-      }
-
-      if (formData.timeLimitEnabled && (!formData.timeLimitMinutes || formData.timeLimitMinutes <= 0)) {
-        toast({
-          title: 'مدة المحاولة غير صالحة',
-          description: 'يرجى إدخال مدة موجبة عند تفعيل المؤقت.',
-          status: 'error',
-          duration: 4000,
-          isClosable: true,
-        });
-        return false;
-      }
-
-      if (formData.showAnswersLater && !formData.answersReleaseDate) {
-        toast({
-          title: 'حدد موعد إظهار الإجابات',
-          description: 'يجب تحديد تاريخ ووقت لإطلاق الإجابات عند تفعيل الجدولة.',
-          status: 'error',
-          duration: 4000,
-          isClosable: true,
-        });
-        return false;
-      }
-
-      if (formData.startWindow && formData.endWindow) {
-        const start = new Date(formData.startWindow);
-        const end = new Date(formData.endWindow);
-        if (start >= end) {
-          toast({
-            title: 'المدى الزمني غير صحيح',
-            description: 'يجب أن يكون موعد الفتح أسبق من موعد الإغلاق.',
-            status: 'error',
-            duration: 4000,
-            isClosable: true,
-          });
-          return false;
-        }
-      }
-
-      return true;
-    };
-
     const handleSubmit = (e) => {
       e.preventDefault();
-      if (!validateForm()) return;
       if (type === 'edit') onSubmit(data.id, formData);
       else onSubmit(formData);
     };
@@ -1454,11 +1498,8 @@ const CourseDetailsPage = () => {
                       </FormLabel>
                       <Input 
                         type="number" 
-                        value={formData.totalGrade}
-                        onChange={e => setFormData({ 
-                          ...formData, 
-                          totalGrade: e.target.value === '' ? '' : parseInt(e.target.value, 10) 
-                        })}
+                        value={formData.total_grade} 
+                        onChange={e => setFormData({ ...formData, total_grade: parseInt(e.target.value) })}
                         placeholder="100"
                         min={1}
                         max={1000}
@@ -1484,56 +1525,35 @@ const CourseDetailsPage = () => {
                         py={6}
                       />
                     </FormControl>
-                    <FormControl flex={1}>
-                      <HStack justify="space-between" align="center" mb={4}>
-                        <FormLabel 
-                          display="flex" 
-                          alignItems="center" 
-                          gap={3} 
-                          fontWeight="bold" 
-                          color="gray.700"
-                          fontSize="lg"
-                          mb={0}
-                          _dark={{ color: "gray.200" }}
+                    <FormControl isRequired flex={1}>
+                      <FormLabel 
+                        display="flex" 
+                        alignItems="center" 
+                        gap={3} 
+                        fontWeight="bold" 
+                        color="gray.700"
+                        fontSize="lg"
+                        mb={4}
+                        _dark={{ color: "gray.200" }}
+                      >
+                        <Box 
+                          p={2} 
+                          bg="green.100" 
+                          borderRadius="lg"
+                          _dark={{ bg: "green.900" }}
                         >
-                          <Box 
-                            p={2} 
-                            bg="green.100" 
-                            borderRadius="lg"
-                            _dark={{ bg: "green.900" }}
-                          >
-                            <Icon as={FaClock} color="green.600" boxSize={5} />
-                          </Box>
-                          المدة (بالدقائق)
-                        </FormLabel>
-                        <Switch
-                          isChecked={formData.timeLimitEnabled}
-                          onChange={e => {
-                            const enabled = e.target.checked;
-                            setFormData(prev => ({
-                              ...prev,
-                              timeLimitEnabled: enabled,
-                              timeLimitMinutes: enabled
-                                ? (prev.timeLimitMinutes || 60)
-                                : prev.timeLimitMinutes
-                            }));
-                          }}
-                          colorScheme="green"
-                          size="lg"
-                          isDisabled={loading}
-                        />
-                      </HStack>
+                          <Icon as={FaClock} color="green.600" boxSize={5} />
+                        </Box>
+                        المدة (بالدقائق)
+                      </FormLabel>
                       <Input 
                         type="number" 
-                        value={formData.timeLimitMinutes}
-                        onChange={e => setFormData({ 
-                          ...formData, 
-                          timeLimitMinutes: e.target.value === '' ? '' : parseInt(e.target.value, 10) 
-                        })}
+                        value={formData.duration} 
+                        onChange={e => setFormData({ ...formData, duration: parseInt(e.target.value) })}
                         placeholder="60"
                         min={1}
                         max={300}
-                        isDisabled={!formData.timeLimitEnabled || loading}
+                        isDisabled={loading}
                         borderRadius="xl"
                         border="2px solid"
                         borderColor="gray.200"
@@ -1554,9 +1574,6 @@ const CourseDetailsPage = () => {
                         fontSize="lg"
                         py={6}
                       />
-                      <Text fontSize="sm" color="gray.500" _dark={{ color: "gray.400" }} mt={2}>
-                        يتم تطبيق المؤقت لكل محاولة عند تفعيله.
-                      </Text>
                     </FormControl>
                   </HStack>
                 </Box>
@@ -1595,8 +1612,8 @@ const CourseDetailsPage = () => {
                       </FormLabel>
                       <Input 
                         type="datetime-local" 
-                        value={formData.startWindow} 
-                        onChange={e => setFormData({ ...formData, startWindow: e.target.value })}
+                        value={formData.show_at} 
+                        onChange={e => setFormData({ ...formData, show_at: e.target.value })}
                         isDisabled={loading}
                         borderRadius="xl"
                         border="2px solid"
@@ -1642,8 +1659,8 @@ const CourseDetailsPage = () => {
                       </FormLabel>
                       <Input 
                         type="datetime-local" 
-                        value={formData.endWindow} 
-                        onChange={e => setFormData({ ...formData, endWindow: e.target.value })}
+                        value={formData.hide_at} 
+                        onChange={e => setFormData({ ...formData, hide_at: e.target.value })}
                         isDisabled={loading}
                         borderRadius="xl"
                         border="2px solid"
@@ -1719,15 +1736,8 @@ const CourseDetailsPage = () => {
                           </Text>
                         </VStack>
                         <Switch 
-                          isChecked={formData.showAnswersImmediately}
-                          onChange={e => {
-                            const checked = e.target.checked;
-                            setFormData(prev => ({
-                              ...prev,
-                              showAnswersImmediately: checked,
-                              ...(checked ? { showAnswersLater: false, answersReleaseDate: '' } : {})
-                            }));
-                          }}
+                          isChecked={formData.show_answers_immediately}
+                          onChange={e => setFormData({ ...formData, show_answers_immediately: e.target.checked })}
                           colorScheme="green"
                           size="lg"
                           isDisabled={loading}
@@ -1735,40 +1745,16 @@ const CourseDetailsPage = () => {
                       </HStack>
                     </Box>
                     
-                    <Box 
-                      p={6} 
-                      bg="white" 
-                      borderRadius="xl" 
-                      border="1px solid" 
-                      borderColor="green.200"
-                      _dark={{ bg: "gray.800", borderColor: "green.700" }}
-                    >
-                      <HStack justify="space-between" align="center" mb={formData.showAnswersLater ? 4 : 0}>
-                        <VStack align="start" spacing={2}>
-                          <Text fontWeight="bold" color="gray.700" fontSize="lg" _dark={{ color: "gray.200" }}>
-                            جدولة إظهار الإجابات
-                          </Text>
-                          <Text fontSize="sm" color="gray.500" _dark={{ color: "gray.400" }}>
-                            اختر موعداً لاحقاً لإظهار التصحيح للطلاب
-                          </Text>
-                        </VStack>
-                        <Switch 
-                          isChecked={formData.showAnswersLater}
-                          onChange={e => {
-                            const checked = e.target.checked;
-                            setFormData(prev => ({
-                              ...prev,
-                              showAnswersLater: checked,
-                              answersReleaseDate: checked ? prev.answersReleaseDate : ''
-                            }));
-                          }}
-                          colorScheme="orange"
-                          size="lg"
-                          isDisabled={loading || formData.showAnswersImmediately}
-                        />
-                      </HStack>
-                      {formData.showAnswersLater && (
-                        <FormControl mt={4}>
+                    {!formData.show_answers_immediately && (
+                      <Box 
+                        p={6} 
+                        bg="white" 
+                        borderRadius="xl" 
+                        border="1px solid" 
+                        borderColor="green.200"
+                        _dark={{ bg: "gray.800", borderColor: "green.700" }}
+                      >
+                        <FormControl>
                           <FormLabel 
                             display="flex" 
                             alignItems="center" 
@@ -1776,6 +1762,7 @@ const CourseDetailsPage = () => {
                             fontWeight="bold" 
                             color="gray.700"
                             fontSize="lg"
+                            mb={4}
                             _dark={{ color: "gray.200" }}
                           >
                             <Box 
@@ -1784,14 +1771,17 @@ const CourseDetailsPage = () => {
                               borderRadius="lg"
                               _dark={{ bg: "orange.900" }}
                             >
-                              <Icon as={FaCalendarAlt} color="orange.600" boxSize={5} />
+                              <Icon as={FaClock} color="orange.600" boxSize={5} />
                             </Box>
-                            موعد إصدار الإجابات
+                            إظهار الإجابات بعد (ساعات)
                           </FormLabel>
                           <Input 
-                            type="datetime-local"
-                            value={formData.answersReleaseDate}
-                            onChange={e => setFormData({ ...formData, answersReleaseDate: e.target.value })}
+                            type="number" 
+                            value={formData.show_answers_after_hours} 
+                            onChange={e => setFormData({ ...formData, show_answers_after_hours: parseInt(e.target.value) })}
+                            placeholder="24"
+                            min={1}
+                            max={168}
                             isDisabled={loading}
                             borderRadius="xl"
                             border="2px solid"
@@ -1814,13 +1804,8 @@ const CourseDetailsPage = () => {
                             py={6}
                           />
                         </FormControl>
-                      )}
-                      {formData.showAnswersImmediately && (
-                        <Text mt={4} fontSize="sm" color="gray.500" _dark={{ color: "gray.400" }}>
-                          لا يمكن تفعيل الجدولة عند اختيار الإظهار الفوري.
-                        </Text>
-                      )}
-                    </Box>
+                      </Box>
+                    )}
                   </VStack>
                 </Box>
 
@@ -1874,8 +1859,8 @@ const CourseDetailsPage = () => {
                           </Text>
                         </VStack>
                         <Switch 
-                          isChecked={formData.isVisible}
-                          onChange={e => setFormData({ ...formData, isVisible: e.target.checked })}
+                          isChecked={formData.is_visible}
+                          onChange={e => setFormData({ ...formData, is_visible: e.target.checked })}
                           colorScheme="blue"
                           size="lg"
                           isDisabled={loading}
@@ -1901,35 +1886,9 @@ const CourseDetailsPage = () => {
                           </Text>
                         </VStack>
                         <Switch 
-                          isChecked={formData.lockNextLectures}
-                          onChange={e => setFormData({ ...formData, lockNextLectures: e.target.checked })}
+                          isChecked={formData.lock_next_lectures}
+                          onChange={e => setFormData({ ...formData, lock_next_lectures: e.target.checked })}
                           colorScheme="red"
-                          size="lg"
-                          isDisabled={loading}
-                        />
-                      </HStack>
-                    </Box>
-                    <Box 
-                      p={6} 
-                      bg="white" 
-                      borderRadius="xl" 
-                      border="1px solid" 
-                      borderColor="blue.200"
-                      _dark={{ bg: "gray.800", borderColor: "blue.700" }}
-                    >
-                      <HStack justify="space-between" align="center">
-                        <VStack align="start" spacing={2}>
-                          <Text fontWeight="bold" color="gray.700" fontSize="lg" _dark={{ color: "gray.200" }}>
-                            السماح بأكثر من محاولة
-                          </Text>
-                          <Text fontSize="sm" color="gray.500" _dark={{ color: "gray.400" }}>
-                            في حال الإيقاف، تظهر الأسئلة مرة واحدة فقط بعد التسليم الأول.
-                          </Text>
-                        </VStack>
-                        <Switch 
-                          isChecked={formData.allowMultipleAttempts}
-                          onChange={e => setFormData({ ...formData, allowMultipleAttempts: e.target.checked })}
-                          colorScheme="purple"
                           size="lg"
                           isDisabled={loading}
                         />
@@ -3037,7 +2996,7 @@ D) has made`}
 
   const { course, lectures } = courseData;
   return (
-    <Box minH={{ base: '100vh', md: '100vh' }} bg={pageBg} dir="rtl" className="mt-[=5 0px]">
+    <Box minH={{ base: '100vh', md: '100vh' }} bg={pageBg} dir="rtl" className="mt-[50px] mb-[200px]">
       {/* Hero Section - Full Width Image with Overlay */}
       <CourseHeroSection 
         course={course}

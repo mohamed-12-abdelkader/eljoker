@@ -991,7 +991,7 @@ const CourseExamsTab = ({
   };
 
   return (
-    <VStack spacing={{ base: 3, md: 4 }} align="stretch" className="mb-[180px]">
+    <VStack spacing={{ base: 3, md: 4 }} align="stretch">
       <Flex
         justify="space-between" 
         align="center" 

@@ -1021,9 +1021,6 @@ const Exam = () => {
                     <FaBookOpen color="#3182ce" size={22} />
                     <Text fontWeight="bold" fontSize="lg" color="blue.800">{questions[current].questionText || "سؤال صوري"}</Text>
                   </HStack>
-                  <Badge colorScheme="purple" fontSize="md" px={3} py={1} borderRadius="md">
-                    درجة السؤال: {questions[current].grade || 0}
-                  </Badge>
                 </HStack>
                 <Divider mb={4} />
                 {getQuestionImageSrc(questions[current].questionImage) && (
@@ -1051,10 +1048,10 @@ const Exam = () => {
                        >
                     <Stack direction="column" spacing={4}>
                       {[
-                        { letter: "A", text: questions[current].optionA },
-                        { letter: "B", text: questions[current].optionB },
-                        { letter: "C", text: questions[current].optionC },
-                        { letter: "D", text: questions[current].optionD },
+                        { letter: "A", arabicLetter: "أ", text: questions[current].optionA },
+                        { letter: "B", arabicLetter: "ب", text: questions[current].optionB },
+                        { letter: "C", arabicLetter: "ج", text: questions[current].optionC },
+                        { letter: "D", arabicLetter: "د", text: questions[current].optionD },
                       ].map((option) => {
                         const isSelected = studentAnswers[questions[current].id] === option.letter;
                         return (
@@ -1078,7 +1075,7 @@ const Exam = () => {
                                 mr={3}
                               />
                               <Text fontWeight="bold" fontSize="md">
-                                {option.letter}. {option.text}
+                                {option.letter}. {option.arabicLetter}
                               </Text>
                             </Box>
                           </Tooltip>
@@ -1315,9 +1312,6 @@ const Exam = () => {
                       onClick={() => setDeleteModal({ open: true, qid: q.id })}
                     />
                   </HStack>
-                  <Badge colorScheme="purple" fontSize="md" px={3} py={1} borderRadius="md">
-                    درجة السؤال: {q.grade || 0}
-                  </Badge>
                 </HStack>
                 <Divider mb={4} />
                 {getQuestionImageSrc(q.question_image) && (
