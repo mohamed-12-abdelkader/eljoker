@@ -46,9 +46,9 @@ const StudentStreamsList = ({ courseId }) => {
   // Debug: طباعة البيانات لمعرفة البنية الفعلية
   useEffect(() => {
     if (streams.length > 0) {
-      console.log('Streams data:', streams);
-      console.log('First stream:', streams[0]);
-      console.log('First stream keys:', Object.keys(streams[0]));
+      console.log("Streams data:", streams);
+      console.log("First stream:", streams[0]);
+      console.log("First stream keys:", Object.keys(streams[0]));
     }
   }, [streams]);
 
@@ -104,27 +104,34 @@ const StudentStreamsList = ({ courseId }) => {
 
               {/* Right side: student actions */}
               <Flex align="center" gap={2}>
-                {stream.status === "started" && (() => {
-                  // استخدام المعرف الصحيح - stream.id أو stream.meeting_id أو stream.uuid
-                  const streamId = stream.id || stream.meeting_id || stream.uuid || stream.meeting_uuid;
-                  if (!streamId) {
-                    console.error("Stream ID is missing:", stream);
-                    return null;
-                  }
-                  const streamUrl = `https://stream.e-monline.online/stream/${streamId}?t=${localStorage.getItem("token")}`;
-                  return (
-                    <IconButton
-                      as="a"
-                      href={streamUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      icon={<FaPlay />}
-                      aria-label="دخول البث"
-                      colorScheme="blue"
-                      size="sm"
-                    />
-                  );
-                })()}
+                {stream.status === "started" &&
+                  (() => {
+                    // استخدام المعرف الصحيح - stream.id أو stream.meeting_id أو stream.uuid
+                    const streamId =
+                      stream.id ||
+                      stream.meeting_id ||
+                      stream.uuid ||
+                      stream.meeting_uuid;
+                    if (!streamId) {
+                      console.error("Stream ID is missing:", stream);
+                      return null;
+                    }
+                    const streamUrl = `https://stream.next-edu.online/stream/${streamId}?t=${localStorage.getItem(
+                      "token"
+                    )}`;
+                    return (
+                      <IconButton
+                        as="a"
+                        href={streamUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        icon={<FaPlay />}
+                        aria-label="دخول البث"
+                        colorScheme="blue"
+                        size="sm"
+                      />
+                    );
+                  })()}
 
                 {stream.status === "ended" && stream.egress_url && (
                   <IconButton

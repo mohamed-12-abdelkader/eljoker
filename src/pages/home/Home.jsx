@@ -12,7 +12,6 @@ const Home = () => {
   const [userData, isAdmin, isTeacher, student] = UserType();
   return (
     <div>
-      <SectionOne />
       {student ? (
         <div className="mb-[100px]">
           <LoginHome />
@@ -20,6 +19,7 @@ const Home = () => {
       ) : (
         <div>
           {" "}
+          <SectionOne />
           <SectionTwo />
           <SectionFour />
         </div>

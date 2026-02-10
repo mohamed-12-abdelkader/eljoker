@@ -159,9 +159,7 @@ const CourseStreamsList = ({ courseId }) => {
                 <Text fontSize="md" fontWeight="bold">
                   {stream.title}
                 </Text>
-                <Text>
-                  {stream.id}
-                </Text>
+                <Text>{stream.id}</Text>
                 <Badge
                   mt={1}
                   colorScheme={statusColor[stream.status]}
@@ -175,7 +173,7 @@ const CourseStreamsList = ({ courseId }) => {
                 {(stream.status === "started" || stream.status === "idle") && (
                   <Button
                     as="a"
-                    href={`https://stream.e-monline.online/stream/${
+                    href={`https://stream.next-edu.online/stream/${
                       stream.id
                     }?t=${localStorage.getItem("token")}`}
                     target="_blank"

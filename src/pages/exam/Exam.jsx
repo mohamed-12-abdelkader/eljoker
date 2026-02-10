@@ -1054,6 +1054,8 @@ const Exam = () => {
                         { letter: "D", arabicLetter: "د", text: questions[current].optionD },
                       ].map((option) => {
                         const isSelected = studentAnswers[questions[current].id] === option.letter;
+                        const isImageQuestion = questions[current].type === "IMAGE";
+                        const displayText = isImageQuestion ? option.arabicLetter : option.text;
                         return (
                           <Tooltip key={option.letter} label="اختر هذه الإجابة" placement="left" hasArrow>
                             <Box
@@ -1075,7 +1077,7 @@ const Exam = () => {
                                 mr={3}
                               />
                               <Text fontWeight="bold" fontSize="md">
-                                {option.letter}. {option.arabicLetter}
+                                {option.letter}. {displayText}
                               </Text>
                             </Box>
                           </Tooltip>

@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const baseUrl = axios.create({
-  baseURL: "https://api.e-monline.online/",
+  baseURL: "https://api.next-edu.online/",
   timeout: 30000, // 30 seconds timeout
   headers: {
     "Content-Type": "application/json",
-    "Accept": "application/json",
+    Accept: "application/json",
   },
 });
 
@@ -34,7 +34,7 @@ baseUrl.interceptors.response.use(
     } else if (error.code === "ERR_INTERNET_DISCONNECTED") {
       error.message = "لا يوجد اتصال بالإنترنت";
     }
-    
+
     return Promise.reject(error);
   }
 );

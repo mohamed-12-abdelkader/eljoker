@@ -49,7 +49,7 @@ const Root = () => {
           <Router>
             <SidebarWithHeader />
             <App />
-            <WhatsButton />
+
             <Footer />
           </Router>
         </ChakraProvider>

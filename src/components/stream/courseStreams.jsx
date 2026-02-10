@@ -64,7 +64,7 @@ function CourseStreams({ courseId, isAdmin, isTeacher, isStudent }) {
           {hasActiveStream ? (
             <Button
               as="a"
-              href={`https://stream.e-monline.online/stream/${
+              href={`https://stream.next-edu.online/stream/${
                 stream.id
               }?t=${localStorage.getItem("token")}`}
               target="_blank"
@@ -81,7 +81,7 @@ function CourseStreams({ courseId, isAdmin, isTeacher, isStudent }) {
         </Flex>
       )}
 
-      <CourseStreamsList courseId={courseId}/>
+      <CourseStreamsList courseId={courseId} />
 
       <CreateStreamModal
         courseId={courseId}

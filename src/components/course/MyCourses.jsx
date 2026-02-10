@@ -32,7 +32,6 @@ import {
   FaCheckCircle,
   FaCamera,
   FaGraduationCap,
-  FaUsers,
   FaChevronUp,
   FaChevronDown,
 } from 'react-icons/fa';
@@ -66,8 +65,14 @@ const MyCourses = () => {
   const textColor = useColorModeValue('gray.800', 'gray.100');
   const subTextColor = useColorModeValue('gray.600', 'gray.300');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const cardHoverBorder = useColorModeValue('blue.300', 'blue.500');
+  const cardGradient = useColorModeValue('linear(to-br, white, gray.50)', 'linear(to-br, gray.800, gray.700)');
+  const buttonGradient = useColorModeValue('linear(to-r, blue.500, blue.600)', 'linear(to-r, teal.500, teal.600)');
+  const buttonHoverGradient = useColorModeValue('linear(to-r, blue.600, blue.700)', 'linear(to-r, teal.600, teal.700)');
 
   // Fetch courses from API
+  // الاستجابة: { items: [...], courses_count, general_courses_count, packages_count, total }
+  // كل عنصر في items: id, title, price, description, teacher_id, avatar, grade_id, created_at, type
   const fetchCourses = async () => {
     try {
       setLoading(true);
@@ -75,18 +80,26 @@ const MyCourses = () => {
       const response = await baseUrl.get('api/course/my-enrollments', {
         headers: authHeader,
       });
-      
-      if (response.data && response.data.courses) {
-        // تصفية الكورسات لعرض فقط كورسات المدرس الذي له teacher_id: 1753
-        const filteredCourses = response.data.courses.filter(
-          (course) => course.teacher_id === 1753
-        );
-        setCourses(filteredCourses);
-      } else {
-        setCourses([]);
-      }
-    } catch (error) {
-      console.error('Error fetching courses:', error);
+
+      const data = response?.data;
+      const rawItems = data?.items ?? data?.data?.items ?? data?.courses;
+      const list = Array.isArray(rawItems) ? rawItems : [];
+
+      const normalized = list.map((item) => ({
+        id: item.id,
+        title: item.title ?? '',
+        price: item.price != null ? String(item.price) : '',
+        description: item.description ?? '',
+        teacher_id: item.teacher_id,
+        avatar: item.avatar ?? '',
+        grade_id: item.grade_id,
+        created_at: item.created_at ?? null,
+        type: item.type ?? 'course',
+      }));
+
+      setCourses(normalized);
+    } catch (err) {
+      console.error('Error fetching courses:', err);
       setError('حدث خطأ في تحميل الكورسات');
       setCourses([]);
     } finally {
@@ -286,142 +299,95 @@ const MyCourses = () => {
   }
 
   return (
-    <Box w="100%" py={8} px={{ base: 4, md: 6, lg: 8 }}>
-      {/* Header Section */}
+    <Box w="100%" py={{ base: 6, md: 8 }} px={{ base: 4, md: 6 }} dir="rtl">
+      {/* Header */}
       <Flex
         direction={{ base: 'column', md: 'row' }}
         justify="space-between"
-        align={{ base: 'flex-start', md: 'center' }}
-        mb={8}
+        align={{ base: 'stretch', md: 'center' }}
+        mb={6}
         gap={4}
       >
-        <VStack align={{ base: 'flex-start', md: 'flex-start' }} spacing={2}>
-          <Heading
-            size={{ base: 'xl', md: '2xl' }}
-            color="blue.500"
-            fontWeight="bold"
-          >
+        <VStack align={{ base: 'flex-start', md: 'flex-start' }} spacing={1}>
+          <Heading size={{ base: 'lg', md: 'xl' }} color={textColor} fontWeight="700">
             كورساتي
+            {courses.length > 0 && (
+              <Text as="span" color={subTextColor} fontWeight="500" fontSize="md" mr={2}>
+                ({courses.length})
+              </Text>
+            )}
           </Heading>
-          <Text color={subTextColor} fontSize={{ base: 'sm', md: 'md' }}>
-            جميع الكورسات المشترك بها
+          <Text color={subTextColor} fontSize="sm">
+            الكورسات المشترك بها
           </Text>
         </VStack>
 
-        {/* QR Activation Button */}
-        <Box
-          as="button"
+        <Button
           onClick={openQrScannerModal}
+          leftIcon={<Icon as={FaQrcode} boxSize={5} />}
           bgGradient="linear(to-r, blue.500, blue.600)"
           color="white"
-          borderRadius="2xl"
-          px={{ base: 6, md: 8 }}
-          py={{ base: 4, md: 5 }}
-          boxShadow="xl"
+          borderRadius="xl"
+          px={5}
+          py={6}
           _hover={{
             bgGradient: 'linear(to-r, blue.600, blue.700)',
-            transform: 'translateY(-3px)',
-            shadow: '2xl',
+            transform: 'translateY(-2px)',
+            boxShadow: 'lg',
           }}
-          transition="all 0.3s"
-          border="2px solid"
-          borderColor="blue.400"
-          position="relative"
-          overflow="hidden"
+          transition="all 0.2s"
+          fontWeight="bold"
+          fontSize="md"
         >
-          {/* Background Animation */}
-          <Box
-            position="absolute"
-            top="0"
-            left="-100%"
-            w="100%"
-            h="100%"
-            bgGradient="linear(to-r, transparent, rgba(255,255,255,0.2), transparent)"
-            transition="left 0.5s"
-            _hover={{ left: '100%' }}
-          />
-          
-          <HStack spacing={3} position="relative" zIndex={1}>
-            <Box
-              bg="whiteAlpha.200"
-              borderRadius="lg"
-              p={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Icon as={FaCamera} boxSize={{ base: 5, md: 6 }} />
-            </Box>
-            <VStack align="flex-start" spacing={0}>
-              <Text
-                fontSize={{ base: 'md', md: 'lg' }}
-                fontWeight="bold"
-                lineHeight="shorter"
-              >
-                📱 امسح QR Code
-              </Text>
-              <Text
-                fontSize={{ base: 'xs', md: 'sm' }}
-                opacity={0.9}
-                fontWeight="medium"
-              >
-                لتفعيل كورس جديد
-              </Text>
-            </VStack>
-            <Icon as={FaQrcode} boxSize={{ base: 5, md: 6 }} opacity={0.8} />
-          </HStack>
-        </Box>
+          تفعيل كورس (QR)
+        </Button>
       </Flex>
 
       {/* Courses Grid */}
       {courses.length > 0 ? (
-        <div className="flex flex-wrap  ">
+        <SimpleGrid
+          columns={{ base: 1, sm: 2, lg: 3 }}
+          spacing={6}
+          w="full"
+        >
           {courses.map((course) => (
-                  <Link 
-                key={course.id}
-                className="w-full md:w-[330px] mx-3" 
-                to={`/CourseDetailsPage/${course.id}`} 
-                style={{ textDecoration: "none" }}
+            <Link
+              key={course.id}
+              to={`/CourseDetailsPage/${course.id}`}
+              style={{ textDecoration: 'none' }}
+              _hover={{ outline: 'none' }}
+            >
+              <Card
+                bg={cardBg}
+                border="1px solid"
+                borderColor={borderColor}
+                borderRadius="2xl"
+                overflow="hidden"
+                shadow="md"
+                _hover={{
+                  shadow: 'xl',
+                  transform: 'translateY(-4px)',
+                  borderColor: cardHoverBorder,
+                }}
+                transition="all 0.3s ease"
+                display="flex"
+                flexDirection="column"
+                h="full"
+                bgGradient={cardGradient}
+                role="group"
+                cursor="pointer"
               >
-                <Card
-                  className=" stu-course  md:w-[340px] my-3"
-                
-                  bg={cardBg}
-                  border="1px solid"
-                  borderColor={borderColor}
-                  borderRadius="2xl"
-                  overflow="hidden"
-                  shadow="lg"
-                  _hover={{
-                    shadow: "2xl",
-                    transform: "translateY(-8px)",
-                    borderColor: useColorModeValue("blue.300", "blue.500"),
-                  }}
-                  transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                  display="flex"
-                  flexDirection="column"
-                  position="relative"
-                  bgGradient={useColorModeValue("linear(to-br, white, gray.50)", "linear(to-br, gray.800, gray.700)")}
-                  role="group"
-                  cursor="pointer"
-                >
-                  <Box position="relative" overflow="hidden" borderRadius="2xl">
-                    <AspectRatio
-                      ratio={16 / 9}
-                      w="100%"
-                     
-                    >
-                      <Image
-                      style={{borderRadius:"20px"}}
-                       className="p-2"
-                        src={course.avatar}
-                        alt={course.title}
-                        objectFit="cover"
-                        transition="transform 0.4s ease"
-                        _groupHover={{ transform: "scale(1.05)" }}
-                        fallbackSrc="https://via.placeholder.com/400x225/4A90E2/FFFFFF?text=Course+Image"
-                      />
-                    </AspectRatio>
+                <Box position="relative" overflow="hidden">
+                  <AspectRatio ratio={16 / 9} w="100%">
+                    <Image
+                      src={course.avatar || ''}
+                      alt={course.title || 'كورس'}
+                      objectFit="cover"
+                      transition="transform 0.3s ease"
+                      _groupHover={{ transform: 'scale(1.05)' }}
+                      fallbackSrc="https://via.placeholder.com/400x225/4A90E2/FFFFFF?text=Course"
+                    />
+                  </AspectRatio>
                     {/* Gradient overlay */}
                     <Box
                       position="absolute"
@@ -475,21 +441,21 @@ const MyCourses = () => {
                           {course.title}
                         </Text>
                         {/* Course Description */}
-                        {course.description && (
+                        {course.description ? (
                           <Box w="full">
                             <Text
                               fontSize={{ base: "sm", sm: "md" }}
                               color={subTextColor}
                               textAlign="right"
                               lineHeight="tall"
-                              noOfLines={expandedCards[course.id] ? undefined : 1}
+                              noOfLines={expandedCards[course.id] ? undefined : 2}
                             >
                               {course.description}
                             </Text>
-                            {course.description.length > 50 && (
-                              <HStack 
-                                spacing={1} 
-                                mt={2} 
+                            {String(course.description).length > 50 ? (
+                              <HStack
+                                spacing={1}
+                                mt={2}
                                 justify="flex-end"
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -500,11 +466,7 @@ const MyCourses = () => {
                                 _hover={{ opacity: 0.8 }}
                                 transition="opacity 0.2s ease"
                               >
-                                <Text
-                                  color="blue.500"
-                                  fontSize="xs"
-                                  fontWeight="bold"
-                                >
+                                <Text color="blue.500" fontSize="xs" fontWeight="bold">
                                   {expandedCards[course.id] ? "عرض أقل" : "عرض المزيد"}
                                 </Text>
                                 <Icon
@@ -513,91 +475,60 @@ const MyCourses = () => {
                                   boxSize={3}
                                 />
                               </HStack>
-                            )}
+                            ) : null}
                           </Box>
-                        )}
+                        ) : null}
                       </Box>
 
-                      {/* Course Stats */}
-                      <Box w="full">
-                        <HStack justify="space-between" mb={3} flexWrap="wrap" gap={2}>
-                          <HStack spacing={2}>
-                            <Icon as={FaGraduationCap} color="blue.500" />
-                            <Text fontSize="sm" color={subTextColor}>
-                              كورس تعليمي
-                            </Text>
-                          </HStack>
-                          <HStack spacing={1} color={subTextColor}>
-                            <Icon as={FaUsers} />
-                            <Text fontSize="sm">
-                              {Math.floor(Math.random() * 500) + 100} طالب
-                            </Text>
-                          </HStack>
+                      {/* Price and Date */}
+                      <HStack justify="space-between" w="full" flexWrap="wrap" gap={2}>
+                        <Badge
+                          colorScheme="green"
+                          borderRadius="full"
+                          px={3}
+                          py={1.5}
+                          fontSize="sm"
+                          fontWeight="bold"
+                        >
+                          {course.price != null ? `${Number(course.price)} جنيه` : '—'} 💰
+                        </Badge>
+                        <HStack spacing={1} color={subTextColor} fontSize="sm">
+                          <Icon as={FaCalendarAlt} boxSize={4} />
+                          <Text>
+                            {course.created_at
+                              ? formatDate(course.created_at)
+                              : '—'}
+                          </Text>
                         </HStack>
-
-                        {/* Price and Date */}
-                        <HStack justify="space-between" w="full" mb={4}>
-                          <Badge
-                            colorScheme="green"
-                            borderRadius="full"
-                            px={4}
-                            py={2}
-                            fontSize="sm"
-                            fontWeight="bold"
-                            bg="green.500"
-                            color="white"
-                            boxShadow="md"
-                          >
-                            {course.price} جنيه 💰
-                          </Badge>
-                          <HStack spacing={1} color={subTextColor} fontSize="sm">
-                            <Icon as={FaCalendarAlt} />
-                            <Text>
-                              {new Date(course.created_at).toLocaleDateString('ar-EG', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </Text>
-                          </HStack>
-                        </HStack>
-                      </Box>
+                      </HStack>
 
                       {/* Action Button */}
                       <Button
-                        colorScheme={buttonColorScheme}
                         w="full"
-                        size="lg"
+                        size="md"
                         rightIcon={<FaPlay />}
                         borderRadius="xl"
                         fontSize="md"
                         fontWeight="bold"
-                        bgGradient={useColorModeValue(
-                          "linear(to-r, blue.500, blue.600)",
-                          "linear(to-r, teal.500, teal.600)"
-                        )}
+                        bgGradient={buttonGradient}
+                        color="white"
                         _hover={{
-                          bgGradient: useColorModeValue(
-                            "linear(to-r, blue.600, blue.700)",
-                            "linear(to-r, teal.600, teal.700)"
-                          ),
-                          transform: "translateY(-2px)",
-                          boxShadow: "xl"
+                          bgGradient: buttonHoverGradient,
+                          transform: 'translateY(-2px)',
+                          boxShadow: 'lg',
                         }}
-                        _active={{
-                          transform: "translateY(0px)"
-                        }}
-                        transition="all 0.2s ease"
-                        boxShadow="lg"
+                        _active={{ transform: 'translateY(0)' }}
+                        transition="all 0.2s"
+                        boxShadow="md"
                       >
                         دخول الكورس
                       </Button>
                     </VStack>
                   </CardBody>
-                  </Card>
-                </Link>
+                </Card>
+              </Link>
           ))}
-        </div>
+        </SimpleGrid>
       ) : (
         <Center py={20}>
           <VStack spacing={6}>
